@@ -1,6 +1,7 @@
-# Starting file for Lab 3 - objects.py
-# Include your name, class, and date in the assignment comment header
-
+# Lab 3 - objects.py
+# Rg, DEV 128
+# submission
+ 
 from dataclasses import dataclass
 
 @dataclass
