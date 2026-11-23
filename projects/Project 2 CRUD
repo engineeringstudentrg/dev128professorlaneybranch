@@ -1,9 +1,9 @@
-  """
-PEOPLE_GUI.PY - Presentation Layer
-==================================
-This file handles ALL GUI operations using Tkinter.
-It imports database_operations.py to access business logic.
-"""
+
+#PEOPLE_GUI.PY - Presentation Layer
+#===============================================================
+#This file handles ALL GUI operations using Tkinter.
+#It imports database_operations.py to access business logic.
+
 
 import sys
 import os
