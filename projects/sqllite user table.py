@@ -47,7 +47,7 @@ def display_users(cursor: sqlite3.Cursor) -> None:
 
 
 def main() -> None:
-    print("SQLite Practice - User Directory\n")
+    print("SQLSuperlite App - User Directory\n")
 
     # 'with' automatically commits changes on success and rolls back on errors
     with sqlite3.connect(DB_NAME) as conn:
