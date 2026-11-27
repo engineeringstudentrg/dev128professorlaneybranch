@@ -1,0 +1,151 @@
+# Citation: Structure and SQLite parameterized query patterns adapted with assistance from Google Gemini.
+# Author: [Your Name]
+# Project 1: Persistent SQLite User Directory
+
+import sqlite3
+
+DB_NAME = "users.db"
+
+
+def setup_database(cursor):
+    """Create the user table if it doesn't exist and seed 5 initial records once."""
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS user (
+            first_name TEXT,
+            last_name TEXT,
+            email TEXT,
+            phone TEXT,
+            street_address TEXT,
+            city TEXT,
+            state TEXT,
+            zipcode TEXT
+        )
+        """
+    )
+
+    # Check if the table is empty before inserting the 5 starting records
+    # so they don't duplicate every time the program restarts.
+    cursor.execute("SELECT COUNT(*) FROM user")
+    if cursor.fetchone()[0] == 0:
+        initial_users = [
+            ("Tony", "Stark", "ironman@stark.com", "555-111-2222", "10880 Malibu Point", "Malibu", "CA", "90265"),
+            ("Carol", "Danvers", "marvel@stark.com", "555-123-2424", "1233 Michigan Ave", "Boston", "MA", "02115"),
+            ("Steve", "Rogers", "cap@avengers.org", "555-234-5678", "569 Leaman Place", "Brooklyn", "NY", "11201"),
+            ("Natasha", "Romanoff", "widow@shield.gov", "555-345-6789", "412 Potomac Pkwy", "Arlington", "VA", "22201"),
+            ("Peter", "Parker", "spidey@queens.edu", "555-456-7890", "20 Ingram Street", "Forest Hills", "NY", "11375"),
+        ]
+        cursor.executemany(
+            """
+            INSERT INTO user (
+                first_name, last_name, email, phone, street_address, city, state, zipcode
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            initial_users,
+        )
+
+
+def report_all_names(cursor):
+    """Report 1: List all first and last names in the user table."""
+    print("\nAll NAMES in the USER table")
+    print("* " * 14)
+    cursor.execute("SELECT rowid, first_name, last_name FROM user ORDER BY last_name")
+    rows = cursor.fetchall()
+
+    for rowid, first_name, last_name in rows:
+        print(f"{rowid}. {first_name} {last_name}")
+    print()
+
+
+def report_contact_info(cursor):
+    """Report 2: List names, email addresses, and phone numbers."""
+    print("\nNAMES and email/phone for all USERS")
+    print("* " * 18)
+    cursor.execute("SELECT first_name, last_name, email, phone FROM user ORDER BY last_name")
+    rows = cursor.fetchall()
+
+    for first_name, last_name, email, phone in rows:
+        print(f"{first_name} {last_name:<12} | {email:<22} | {phone}")
+    print()
+
+
+def report_locations(cursor):
+    """Report 3: List names with full street address, city, state, and zipcode."""
+    print("\nNAMES and mailing addresses for all USERS")
+    print("* " * 20)
+    cursor.execute(
+        "SELECT first_name, last_name, street_address, city, state, zipcode FROM user ORDER BY state, city"
+    )
+    rows = cursor.fetchall()
+
+    for first_name, last_name, street, city, state, zipcode in rows:
+        print(f"{first_name} {last_name:<12} | {street}, {city}, {state} {zipcode}")
+    print()
+
+
+def add_user(conn, cursor):
+    """Prompt for new user fields and insert into the database using ? placeholders."""
+    print("\nAdd New USER")
+    print("* " * 8)
+    first_name = input("Enter first name: ").strip()
+    last_name = input("Enter last name: ").strip()
+    email = input("Enter email address: ").strip()
+    phone = input("Enter phone number: ").strip()
+    street_address = input("Enter street address: ").strip()
+    city = input("Enter city: ").strip()
+    state = input("Enter 2 digit state abbreviation: ").strip()
+    zipcode = input("Enter zipcode: ").strip()
+
+    cursor.execute(
+        """
+        INSERT INTO user (
+            first_name, last_name, email, phone, street_address, city, state, zipcode
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (first_name, last_name, email, phone, street_address, city, state, zipcode),
+    )
+    conn.commit()
+    print(f"\n{first_name} {last_name} has been entered into the USER table.\n")
+
+
+def display_menu():
+    print("* * * MENU * * *")
+    print("1 - List all NAMES in the user table")
+    print("2 - List NAMES and email/phone for all users")
+    print("3 - List NAMES and mailing addresses for all users")
+    print("4 - Add new User")
+    print("5 - Exit the program")
+
+
+def main():
+    print("Welcome to the MARVEL Universe Database\n")
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    setup_database(cursor)
+    conn.commit()
+
+    while True:
+        display_menu()
+        choice = input("\nYour choice: ").strip()
+
+        if choice == "1":
+            report_all_names(cursor)
+        elif choice == "2":
+            report_contact_info(cursor)
+        elif choice == "3":
+            report_locations(cursor)
+        elif choice == "4":
+            add_user(conn, cursor)
+        elif choice == "5":
+            print("\nThank you for using this program.")
+            break
+        else:
+            print("\nInvalid option. Please choose a number from 1 to 5.\n")
+
+    conn.close()
+
+
+if __name__ == "__main__":
+    main()
