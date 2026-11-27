@@ -3,7 +3,7 @@
 
 import sqlite3
 
-DB_NAME = "Marvel Niggas"
+DB_NAME = "Marvel Nyughus"
 
 
 def setup_database(cursor: sqlite3.Cursor) -> None:
